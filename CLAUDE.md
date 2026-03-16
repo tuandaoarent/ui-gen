@@ -66,6 +66,8 @@ Client stream → FileSystemContext applies tool-call file changes
 
 ### Data Models (Prisma / SQLite)
 
+The full schema is defined in `prisma/schema.prisma`. Reference that file whenever you need to understand the database structure.
+
 - `User`: id, email, hashedPassword
 - `Project`: id, name, userId (optional for anonymous), messages (JSON string), data (JSON string)
 
@@ -76,3 +78,7 @@ Client stream → FileSystemContext applies tool-call file changes
 ### Testing
 
 Tests live in `__tests__/` directories co-located with components. Uses Vitest + jsdom + `@testing-library/react`.
+
+## Code Style
+
+Use comments sparingly. Only comment complex or non-obvious code.

@@ -8,6 +8,10 @@ vi.mock("../MarkdownRenderer", () => ({
   MarkdownRenderer: ({ content }: { content: string }) => <div>{content}</div>,
 }));
 
+vi.mock("../ToolInvocationDisplay", () => ({
+  ToolInvocationDisplay: ({ toolInvocation }: any) => <div>{toolInvocation.toolName}</div>,
+}));
+
 afterEach(() => {
   cleanup();
 });
