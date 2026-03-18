@@ -1,6 +1,7 @@
 import type { FileNode } from "@/lib/file-system";
 import { VirtualFileSystem } from "@/lib/file-system";
 import { streamText, appendResponseMessages } from "ai";
+import { APIError } from "@anthropic-ai/sdk";
 import { buildStrReplaceTool } from "@/lib/tools/str-replace";
 import { buildFileManagerTool } from "@/lib/tools/file-manager";
 import { prisma } from "@/lib/prisma";
@@ -36,8 +37,8 @@ export async function POST(req: Request) {
     messages,
     maxTokens: 10_000,
     maxSteps: isMockProvider ? 4 : 40,
-    onError: (err: any) => {
-      console.error(err);
+    onError: ({ error }) => {
+      console.error("streamText error:", error);
     },
     tools: {
       str_replace_editor: buildStrReplaceTool(fileSystem),
@@ -79,7 +80,16 @@ export async function POST(req: Request) {
     },
   });
 
-  return result.toDataStreamResponse();
+  return result.toDataStreamResponse({
+    getErrorMessage: (error) => {
+      if (error instanceof APIError) {
+        if (error.status === 401) return "Invalid or missing API key. Please check your ANTHROPIC_API_KEY.";
+        if (error.status === 429) return "Rate limit exceeded. Please wait a moment and try again.";
+        if (error.status === 529) return "The AI service is temporarily overloaded. Please try again shortly.";
+      }
+      return "An unexpected error occurred. Please try again.";
+    },
+  });
 }
 
 export const maxDuration = 120;
